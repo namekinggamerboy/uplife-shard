@@ -18,37 +18,37 @@ version: require("./package.json").version,
   start(token, game, name, stats, Prefix, owner, op) {
   if (!token)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me bot token or invite bot token"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot token or invite bot token"
     );
   if (!game)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me bot game"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot game"
     );
 
   if (!name)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me bot game playing status"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot game playing status"
     );
 
   if (!stats)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me bot status"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot status"
     );
  /*  if (!status)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me status"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me status"
     ); */
   if (!Prefix)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me bot prefix"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot prefix"
     );
   
   if (!owner)
     return console.log(
-      "[uplife-api]{type: error} ⚠️: make sure your give me bot Owner id"
+      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot Owner id"
     );
  if (op.music === "true") {
-  if(!op.youtubekey) return console.log("[uplife-api]{type: error} ⚠️: make sure your give me youtube v3 api key for music");
+  if(!op.youtubekey) return console.log("[uplife-api-shard]{type: error} ⚠️: make sure your give me youtube v3 api key for music");
   const player = new Player(client, op.youtubekey);
 client.player = player;
   }
@@ -86,7 +86,7 @@ client.giveawaysManager = manager;
 
     client.on("ready", () => {
       console.log(
-        "[uplife-api]{type: successfully} ✔️bot online: " +
+        "[uplife-api-shard]{type: successfully} ✔️bot online: " +
           client.user.tag +
           " here bot Invite link: " +
           `https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=8`
