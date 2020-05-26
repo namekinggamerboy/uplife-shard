@@ -7,7 +7,6 @@ const ms = require("ms");
 const canvas = require("discord-canvas"),
 welcomeCanvas = new canvas.Welcome();
 const { GiveawaysManager } = require("discord-giveaways");
-const prefiX = require("discord-prefix");
 const { Player } = require("music-uplife");
 
 module.exports = {
@@ -112,43 +111,39 @@ client.giveawaysManager = manager;
    
 client.on("shardReady", (shardID) => {
             client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("");
+                let logsChannel = client.channels.cache.get("649928981977628673");
         
                 if(logsChannel) logsChannel.send('⭕ | Shard #${shardID} is ready!');
             `);
         });
   client.on("shardDisconnect", (shardID) => {
             client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("");
+                let logsChannel = client.channels.cache.get("649928981977628673");
     
                 if(logsChannel) logsChannel.send('💤 | Shard #${shardID} is disconnected...');
             `);
         });
         client.on("shardReconnecting", (shardID) => {
             client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("");
+                let logsChannel = client.channels.cache.get("649928981977628673");
                 if(logsChannel) logsChannel.send('⚠️ | Shard #${shardID} is reconnecting...');
             `);
         });
       client.on("shardResume", (shardID) => {
         client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("");
+                let logsChannel = client.channels.cache.get("649928981977628673");
                 if(logsChannel) logsChannel.send('🍏 | Shard #${shardID} has resumed!');
             `);
+      
         });
-  
+    });
 client.on("message", msg => {
  if (msg.channel.type == "dm") return;
     if (msg.author.bot) {
       return;
     }
     const message = msg;
- prefiX.setPrefix(Prefix) 
- if (prefiX.getPrefix(msg.guild.id) === null) {
-        var prefix = prefiX.getPrefix()
-    } else {
-        var prefix = prefiX.getPrefix(msg.guild.id)
-        }
+let prefix = db.get(`prefix_${msg.guild.id}`)||Prefix;
  if (!msg.content.startsWith(Prefix)) return; 
    /* reset-prefix Command */
       if (msg.content === `${Prefix}reset-prefix`) {
@@ -157,7 +152,7 @@ embed:{
 title: "only Admin parmission user use this Command.", 
 color: 0xff0000
 }});
-    prefiX.setPrefix(`${Prefix}`, msg.guild.id)
+  db.set(`prefix_${msg.guild.id}`, Prefix);
 msg.channel.send({ embed: {
 title: `✅ | successfully reset prefix to ${Prefix}`,
 color: 0x00ff00
@@ -171,11 +166,7 @@ color: 0x00ff00
     if (msg.author.bot) {
       return;
     }
- if (prefiX.getPrefix(msg.guild.id) === null) {
-        var prefix = prefiX.getPrefix()
-    } else {
-        var prefix = prefiX.getPrefix(msg.guild.id)
-    }
+let prefix = db.get(`prefix_${msg.guild.id}`)||Prefix;
 const message = msg;
     
     if (msg.content.match(new RegExp(`^<@!?${client.user.id}>( |)$`))) {
@@ -269,11 +260,7 @@ if(op.welcomer === "true"){
       return;
     }
     const message = msg;
- if (prefiX.getPrefix(msg.guild.id) === null) {
-        var prefix = prefiX.getPrefix()
-    } else {
-        var prefix = prefiX.getPrefix(msg.guild.id)
-    }
+ let prefix = db.get(`prefix_${msg.guild.id}`)||Prefix;
     if (!msg.content.startsWith(prefix)) return;
     const args = msg.content.slice(prefix.length).split(" ");
     const command = args.shift().toLowerCase();
@@ -730,7 +717,7 @@ color: 0xff0000
               title: "Error"
             }
           });
-prefiX.setPrefix(args[0], message.guild.id)
+db.set(`prefix_${message.guild.id}`, args[0]);
 message.channel.send({ embed: {
 title: `✅ | successfully set prefix to ${args[0]}`,
 color: 0x00ff00
@@ -831,7 +818,7 @@ if (!message.member.hasPermission("BAN_MEMBERS")) return message.channel.send({
           });
         })
         .catch(err => {
-          msg.reply("I was unable to ban the member");
+          msg.reply("I was unable to kick the member");
         });
     } else if(command === "warn"){
 let reasons = [
@@ -1250,12 +1237,7 @@ async command(op) {
         return;
       }
       var message = msg;
-      prefiX.setPrefix(op.prefix);
-      if (prefiX.getPrefix(msg.guild.id) === null) {
-        var prefix = prefiX.getPrefix();
-      } else {
-        var prefix = prefiX.getPrefix(msg.guild.id);
-      }
+      let prefix = db.get(`prefix_${msg.guild.id}`)||op.prefix;
       if (!msg.content.startsWith(prefix)) return;
       const args = msg.content.slice(prefix.length).split(" ");
       const command = args.shift().toLowerCase();
