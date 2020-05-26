@@ -1,0 +1,31 @@
+{
+  "name": "uplife-api-shard",
+  "version": "0.0.1",
+  "description": "uplife api shard hosting discord Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "namekinggamerboy",
+  "license": "ISC",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "discord-giveaways": "^4.1.1",
+    "moment": "*",
+    "moment-duration-format": "*",
+    "music-uplife": "github:namekinggamerboy/music-uplife#086de009059815e91d8d61197ba113e1dc755c8d",
+    "opusscript": "^0.0.7",
+    "ms": "*",
+    "discord-prefix": "^1.0.9",
+    "quick.db": "^7.1.1",
+    "discord-canvas": "^1.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.0.0"
+  }
+}
