@@ -1253,7 +1253,7 @@ async command(op) {
           var ssl = message.channel;
         }
         if (op.msgreact) {
-          let react = client.emojis.find(e => e.name === op.msgreact);
+          let react = client.emojis.cache.find(e => e.name === op.msgreact);
           msg.react(react.id);
         }
         if (op.msgdelete) {
@@ -1508,26 +1508,10 @@ async command(op) {
       });
     });
   },
-  async getvar(o) {
-    let hao = db.get(`${o.name}_${o.id}`);
-    return hao;
-  },
+ get: db.get,
 
-  async servervar(o) {
-    db.set(`${o.name}_${o.id}`, o.value);
+ set: db.set,
 
-    console.log(
-      `server var name-${o.name} server id-${o.id} server value-${o.value}`
-    );
-  },
-
-  async uservar(o) {
-    db.set(`${o.name}_${o.id}`, o.value);
-
-    console.log(
-      `user var name-${o.name} user id-${o.id} user value-${o.value}`
-    );
-  },
   async msgdelete(o) {
     client.on("messageDelete", async msg => {
       let message = msg;
@@ -1554,7 +1538,7 @@ async command(op) {
             `<#${message.channel.id}> (${message.channel.name})`,
             true
           );
-        if (message.guild.channels.find(e => e.id === o.channelid)) {
+        if (message.guild.channels.cache.find(e => e.id === o.channelid)) {
           message.guild.channels
             .find(e => e.id === o.channelid)
             .send(embed)
@@ -1576,7 +1560,7 @@ async command(op) {
         newMessage.channel.type == "text" &&
         newMessage.cleanContent != oldMessage.cleanContent
       ) {
-        var log = newMessage.guild.channels.find(e => e.id === o.channelid);
+        var log = newMessage.guild.channels.cache.find(e => e.id === o.channelid);
         log.send({
           embed: {
             color: o.color,
