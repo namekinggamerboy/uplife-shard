@@ -18,37 +18,37 @@ version: require("./package.json").version,
   start(token, game, name, stats, Prefix, owner, op) {
   if (!token)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot token or invite bot token"
+      "[uplife-api]{type: error} ⚠️: make sure your give me bot token or invite bot token"
     );
   if (!game)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot game"
+      "[uplife-api]{type: error} ⚠️: make sure your give me bot game"
     );
 
   if (!name)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot game playing status"
+      "[uplife-api]{type: error} ⚠️: make sure your give me bot game playing status"
     );
 
   if (!stats)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot status"
+      "[uplife-api]{type: error} ⚠️: make sure your give me bot status"
     );
  /*  if (!status)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me status"
+      "[uplife-api]{type: error} ⚠️: make sure your give me status"
     ); */
   if (!Prefix)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot prefix"
+      "[uplife-api]{type: error} ⚠️: make sure your give me bot prefix"
     );
   
   if (!owner)
     return console.log(
-      "[uplife-api-shard]{type: error} ⚠️: make sure your give me bot Owner id"
+      "[uplife-api]{type: error} ⚠️: make sure your give me bot Owner id"
     );
  if (op.music === "true") {
-  if(!op.youtubekey) return console.log("[uplife-api-shard]{type: error} ⚠️: make sure your give me youtube v3 api key for music");
+  if(!op.youtubekey) return console.log("[uplife-api]{type: error} ⚠️: make sure your give me youtube v3 api key for music");
   const player = new Player(client, op.youtubekey);
 client.player = player;
   }
@@ -86,7 +86,7 @@ client.giveawaysManager = manager;
 
     client.on("ready", () => {
       console.log(
-        "[uplife-api-shard]{type: successfully} ✔️bot online: " +
+        "[uplife-api]{type: successfully} ✔️bot online: " +
           client.user.tag +
           " here bot Invite link: " +
           `https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=8`
@@ -107,35 +107,36 @@ client.giveawaysManager = manager;
           },
           status: `${stats}`
         });
-      }, 120000);
-   
+      }, op.statustime);
+ 
+      if(op.shardlog){
 client.on("shardReady", (shardID) => {
             client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("649928981977628673");
-        
-                if(logsChannel) logsChannel.send('⭕ | Shard #${shardID} is ready!');
+                let logsChannel = client.channels.cache.get(op.shardlog);            
+if(logsChannel) logsChannel.send('⭕ | Shard #${shardID} is ready!');
             `);
         });
   client.on("shardDisconnect", (shardID) => {
             client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("649928981977628673");
+                let logsChannel = client.channels.cache.get(op.shardlog);
     
                 if(logsChannel) logsChannel.send('💤 | Shard #${shardID} is disconnected...');
             `);
         });
         client.on("shardReconnecting", (shardID) => {
             client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("649928981977628673");
+                let logsChannel = client.channels.cache.get(op.shardlog);
                 if(logsChannel) logsChannel.send('⚠️ | Shard #${shardID} is reconnecting...');
             `);
         });
       client.on("shardResume", (shardID) => {
         client.shard.broadcastEval(`
-                let logsChannel = client.channels.cache.get("649928981977628673");
+                let logsChannel = client.channels.cache.get(op.shardlog);
                 if(logsChannel) logsChannel.send('🍏 | Shard #${shardID} has resumed!');
             `);
       
         });
+    }
     });
 client.on("message", msg => {
  if (msg.channel.type == "dm") return;
@@ -321,7 +322,7 @@ if(op.welcomer === "true"){
         )
         .addField(
           "Roles",
-          `${member.roles
+          `${member.roles.cache
             .filter(r => r.id !== message.guild.id)
             .map(roles => `<@&${roles.id}>`)
             .join(" **|** ") || "❌No Roles"}`,
@@ -832,7 +833,7 @@ let reasons = [
       "color": 0xff2222
     }
   });
-  let warnedmember = message.guild.member(message.mentions.users.first()) || message.guild.members.get(args[0]);
+  let warnedmember = message.guild.member(message.mentions.users.first());
   if (!warnedmember) return message.channel.send({
     embed: {
       "title": "Please mention a user to warn.`😅`",
@@ -876,7 +877,7 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
       "title": "Error"
     }
   });
-      let member = client.users.find(e => e.id === args.join(" "));
+      let member = client.users.cache.find(e => e.id === args.join(" "));
       if (!args[0])
         return msg.channel.send({
           embed: { title: "user not found🙄", color: 0xff0000 }
@@ -897,7 +898,7 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
       "color": 0xff2222
     }
   });
-  let tomute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+  let tomute = message.guild.member(message.mentions.users.first() || message.guild.members.cache.get(args[0]));
   if (!tomute) return message.channel.send({
     embed: {
       "title": "Couldn't find user :anguished: ",
@@ -910,16 +911,16 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
       "color": 0xff2222
     }
   });
-  let muterole = message.guild.roles.find(e => e.name === "muted");
+  let muterole = message.guild.roles.cache.find(e => e.name === "muted");
 
   if (!muterole) {
     try {
-      muterole = await message.guild.roles.create({ data:{
+      muterole = await message.guild.roles.cache.create({ data:{
         name: "muted",
         color: "#000100",
         permissions: []
       }})
-      message.guild.channels.forEach(async (channel, id) => {
+      message.guild.channels.cache.forEach(async (channel, id) => {
         await channel.createOverwrite(muterole, {
           SEND_MESSAGES: false,
           ADD_REACTIONS: false
@@ -962,8 +963,8 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
             color: 0xff2222
           }
         });
-      let unmute = msg.guild.roles.find(e => e.name === "muted");
-      if (!tomute.roles.has(unmute.id))
+      let unmute = msg.guild.roles.cache.find(e => e.name === "muted");
+      if (!tomute.roles.cache.has(unmute.id))
         return message.channel.send({
           embed: {
             description: `<@${tomute.id}> already unmuted or haven't been muted`,
@@ -1220,7 +1221,7 @@ if(db.get(`msg_${member.guild.id}`)){
 }
 let ch = db.get(`channel_${member.guild.id}`);
 if(ch){
-var ch1 = member.guild.channels.get(ch);
+var ch1 = member.guild.channels.cache.get(ch);
 } else { 
 var ch1;
 }
@@ -1285,7 +1286,7 @@ async command(op) {
             )
             .then(message => {
               if (op.botmsgreact) {
-                let react = client.emojis.find(e => e.id === op.botmsgreact);
+                let react = client.emojis.cache.find(e => e.id === op.botmsgreact);
                 message.react(react.id);
               }
               if (op.botmsgdelete) {
@@ -1378,7 +1379,7 @@ async command(op) {
             .send(ha)
             .then(message => {
               if (op.botmsgreact) {
-                let react = client.emojis.find(e => e.id === op.botmsgreact);
+                let react = client.emojis.cache.find(e => e.id === op.botmsgreact);
                 message.react(react.id);
               }
               if (op.botmsgdelete) {
@@ -1413,7 +1414,7 @@ async command(op) {
             )
             .then(message => {
               if (op.botmsgreact) {
-                let react = client.emojis.find(e => e.id === op.botmsgreact);
+                let react = client.emojis.cache.find(e => e.id === op.botmsgreact);
                 message.react(react.id);
               }
               if (op.botmsgdelete) {
@@ -1448,7 +1449,7 @@ async command(op) {
             .send(attachment)
             .then(message => {
               if (op.botmsgreact) {
-                let react = client.emojis.find(e => e.id === op.botmsgreact);
+                let react = client.emojis.cache.find(e => e.id === op.botmsgreact);
                 message.react(react.id);
               }
               if (op.botmsgdelete) {
@@ -1466,9 +1467,9 @@ async command(op) {
       let icon = guild.icon
         ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=2048`
         : "https://discordemoji.com/assets/emoji/discordcry.png";
-      var op = client.channels.find(e => e.name === o.channelname).id;
+      var op = client.channels.cache.find(e => e.name === o.channelname).id;
       if (!o.channelname) op = o.channelid;
-      let channel = client.channels.get(op);
+      let channel = client.channels.cache.get(op);
       channel.send({
         embed: {
           title: o.title,
@@ -1490,9 +1491,9 @@ async command(op) {
       let icon = guild.icon
         ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=2048`
         : "https://discordemoji.com/assets/emoji/discordcry.png";
-      var op = client.channels.find(e => e.name === o.channelname).id;
+      var op = client.channels.cache.find(e => e.name === o.channelname).id;
       if (!o.channelname) op = o.channelid;
-      let channel = client.channels.get(op);
+      let channel = client.channels.cache.get(op);
       channel.send({
         embed: {
           title: o.title,
@@ -1539,7 +1540,7 @@ async command(op) {
             true
           );
         if (message.guild.channels.cache.find(e => e.id === o.channelid)) {
-          message.guild.channels
+          message.guild.channels.cache
             .find(e => e.id === o.channelid)
             .send(embed)
             .catch(err => {
