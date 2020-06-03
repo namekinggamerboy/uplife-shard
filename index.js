@@ -4,6 +4,7 @@ require("moment-duration-format");
 const client = new Discord.Client();
 const db = require('quick.db');
 const ms = require("ms");
+const fs = require("fs");
 const canvas = require("discord-canvas"),
 welcomeCanvas = new canvas.Welcome();
 const { GiveawaysManager } = require("discord-giveaways");
@@ -72,7 +73,7 @@ const GiveawayManagerWithShardSupport = class extends GiveawaysManager {
 
 // Create a new instance of your new class
 const manager = new GiveawayManagerWithShardSupport(client, {
-    storage: __dirname+"/giveaway.json",
+    storage: op.giveawayStorage,
     updateCountdownEvery: 10000,
     default: {
         botsCanWin: false,
@@ -931,7 +932,7 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
     }
   }
 
-  await (tomute.roles.add(muterole.id));
+  await (tomute.roles.cache.add(muterole.id));
   message.channel.send({
     embed: {
       "title": "Muted",
@@ -964,7 +965,7 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
           }
         });
       let unmute = msg.guild.roles.cache.find(e => e.name === "muted");
-      if (!tomute.roles.cache.has(unmute.id))
+      if (!tomute.roles.cache.some(unmute.id))
         return message.channel.send({
           embed: {
             description: `<@${tomute.id}> already unmuted or haven't been muted`,
@@ -972,7 +973,7 @@ if(warnedmember.id === client.user.id) return message.channel.send({embed:{
             title: "Error"
           }
         });
-      tomute.roles.remove(unmute.id);
+      tomute.roles.cache.remove(unmute.id);
       message.channel.send({
         embed: {
           description: `<@${tomute.id}> has been unmuted by <@${message.author.id}>!`,
@@ -1593,5 +1594,98 @@ async command(op) {
         });
       }
     });
+  },
+  
+  async commandheader(op){
+       
+client.commands = new Discord.Collection();
+client.aliases = new Discord.Collection();
+
+
+fs.readdir(`${op.name}`, (err, files) => {
+
+  if(err) console.log(err);
+  let jsfile = files.filter(f => f.split(".").pop() === "js");
+  if(jsfile.length <= 0){
+    console.log("Couldn't find commands.");
+    return;
+  }
+  jsfile.forEach((f, i) =>{
+    let props = require(`${op.name}/${f}`);
+    console.log(`${f} loaded!`);
+    client.commands.set(props.command.name, props);
+    props.command.aliases.forEach(alias => { 
+      client.aliases.set(alias, props.command.name);
+  
+  });
+});
+})
+  client.on("message", async message => {
+    if(message.author.bot) return;
+    if(message.channel.type === "dm") return;
+      const msg = message;
+let prefix = db.get(`prefix_${msg.guild.id}`)||op.prefix;
+    let messageArray = message.cleanContent;
+    let args = message.content.slice(prefix.length).trim().split(/ +/g);
+    let cmd = args.shift().toLowerCase();
+    let commandfile;
+
+    if (client.commands.has(cmd)) {
+      commandfile = client.commands.get(cmd);
+  } else 
+    if (client.aliases.has(cmd)) {
+    commandfile = client.commands.get(client.aliases.get(cmd));
+  }
+  
+      if (!message.content.startsWith(prefix)) return;
+
+let option = {
+  bot: client,
+  msg: message,
+  discord: Discord,
+  message: args,
+  guild: message.guild,
+  author: message.author,
+  fullmessage: messageArray
+};
+          
+  try {
+    commandfile.run(option);
+  
+  } catch (e) {
+  }
+  });
+  },
+  async reactionrole(op){
+    let initialMessage = op.message;
+const roles = op.role;
+const reactions = op.reaction;
+ let message = op.msg;
+    message.channel.send(initialMessage).then( sent => {  
+  sent.react(reactions);            
+            });
+        
+ 
+client.on('raw', event => {
+    if (event.t === 'MESSAGE_REACTION_ADD' || event.t == "MESSAGE_REACTION_REMOVE"){
+       
+        let channel = client.channels.get(event.d.channel_id);
+        let message = channel.messages.fetch(event.d.message_id).then(msg=> {
+        let user = msg.guild.members.get(event.d.user_id);
+
+            var role = roles;       
+            if (user.id != client.user.id){
+                var roleObj = msg.guild.roles.find(r => r.name === role);
+                var memberObj = msg.guild.members.get(user.id);
+               
+                if (event.t === "MESSAGE_REACTION_ADD"){
+                    memberObj.roles.add(roleObj);
+                } else {
+                    memberObj.roles.remove(roleObj);
+                }
+            }
+   })
+    }
+});
   }
 };
